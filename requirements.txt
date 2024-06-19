@@ -1,0 +1,7 @@
+pyaudio
+SpeechRecognition
+torch
+pygame
+RealtimeSTT
+openai
+interpreter
