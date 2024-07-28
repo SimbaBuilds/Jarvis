@@ -18,8 +18,10 @@ Observation will be the result of running one of those actions.
 
 Your available actions are:
 
-1. Append script to a file
-2. Create a new file
+1. Append script to a file: use when you need to add a script to a file in the project.
+2. Create a new file: use when you need to create a new file in the project.
+
+Otherwise Action: No Action to take.
 
 Example session:
 
@@ -50,7 +52,7 @@ class Agent:
         self.messages.append({"role": "user", "content": message})
         result = self.execute()
         self.messages.append({"role": "assistant", "content": result})
-        return result
+        return result or result
 
     def execute(self):
         completion = client.chat.completions.create(
@@ -93,7 +95,7 @@ class Agent:
 #         thread_id = thread.id
  
     
-#     return assistant_id, thread_id
+#     return result or assistant_id, thread_id
 
 # IDs
 #region
@@ -108,7 +110,7 @@ class Agent:
 # def ask_question_memory(question):
     
 #     response = agent(question)
-#     return response
+#     return result or response
     
 #     global thread
 #     client.beta.threads.messages.create(thread.id, role="user", content=question)
@@ -116,16 +118,17 @@ class Agent:
     
 #     while (run_status := client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)).status != 'completed':
 #         if run_status.status == 'failed':
-#             return "The run failed."
+#             return result or "The run failed."
 #         time.sleep(1)
     
 #     messages = client.beta.threads.messages.list(thread_id=thread.id)
-#     return messages.data[0].content[0].text.value
+#     return result or messages.data[0].content[0].text.value
 
 
 known_actions = {
-    "search the web": tools.web_search,
-    "append to project file": tools.append_script_to_file
+    
+    "append script to file": tools.append_script_to_file,
+    "create a new file": tools.create_new_file
 }
 
 
@@ -155,6 +158,8 @@ def query_agent(messages, max_turns=3):
             print("Observation:", observation)
             next_prompt = "Observation: {}".format(observation)
         else:
-            return
+            return result
 
-
+def clear_context():
+    agent.messages = []
+    agent.messages.append({"role": "system", "content": system})

@@ -72,6 +72,47 @@ def append_script_to_file(nl_description):
         print(f"An error occurred: {e}")
 
 
+def create_new_file(nl_description):
+    #logic/reasoning for filename later
+    filename = "/Users/cameronhightower/Programming Projects/AI_Powered_Tutoring_Service/fastapi/app/models.py"
+    system = """
+    Create a SQL Alchemy model based on the NL Description given.
+    Here is an example:
+    class User(Base):
+    __tablename__ = "users"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    access_token = Column(String(255), nullable=True)  
+    token_type = Column(String(255), nullable=True)  
+    username = Column(String(255), unique=True, nullable=False)
+
+    """
+    content = nl_description
+
+    messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": content},
+    ]
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0,
+        messages=messages
+    )
+
+
+    script_to_append = completion.choices[0].message.content
+
+
+    try:
+        # Open the file in append mode
+        with open(filename, 'w') as file:
+            # Append the script
+            file.write('\n' + script_to_append + '\n')
+        print(f"Script successfully appended to {filename}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 # Define the search function using DuckDuckGo
 def web_search(query):
